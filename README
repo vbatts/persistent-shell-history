@@ -12,6 +12,16 @@ and set in ~/.bashrc:
   export HISTCONTROL="ignoreboth"
 
 
+== USAGE
+See the --help also,
+  Usage: bash_history [options]
+        --inspect                    inspect the data
+    -l, --list                       list history
+        --fix                        fix times
+    -f, --find PAT                   find a command with pattern PAT
+
+
+
 == LICENSE
 Copyright (c) 2012  Vincent Batts, Raleigh, NC, USA
 
