@@ -59,9 +59,16 @@ end
 if $0 == __FILE__
   require 'optparse'
   options = {}
+  bh_options = {}
   OptionParser.new do |opts|
     opts.on('--inspect','inspect the data') do |o|
       options[:inspect] = o
+    end
+    opts.on('--history FILE','use bash_history FILE instead of the default (~/.bash_history)') do |o|
+      bh_options[:file] = o
+    end
+    opts.on('--db FILE','use database FILE instead of the default (~/.bash_history.db)') do |o|
+      bh_options[:archive_file] = o
     end
     opts.on('-l','--list','list history') do |o|
       options[:list] = o
@@ -70,17 +77,15 @@ if $0 == __FILE__
       options[:fix] = o
     end
     opts.on('--format FORMAT','specify a different strftime format. (default is "%F %T")') do |o|
-      options[:format] = o
+      bh_options[:time_format] = o
     end
     opts.on('-f','--find PAT','find a command with pattern PAT') do |o|
       options[:find] = o
     end
   end.parse!(ARGV)
 
-  bh = BashHistory.new
-  if options[:format]
-    bh.time_format = options[:format]
-  end
+  bh = BashHistory.new(bh_options)
+
   if options[:inspect]
     p bh
     p "storing #{bh.keys.count} commands"
