@@ -14,12 +14,14 @@ and set in ~/.bashrc:
 
 == USAGE
 See the --help also,
-  Usage: bash_history [options]
+Usage: bash_history [options]
         --inspect                    inspect the data
+    -h, --history FILE               use bash_history FILE instead of the default (~/.bash_history)
+    -d, --db FILE                    use database FILE instead of the default (~/.bash_history.db)
     -l, --list                       list history
         --fix                        fix times
+        --format FORMAT              specify a different strftime format. (default is "%F %T")
     -f, --find PAT                   find a command with pattern PAT
-
 
 
 == LICENSE

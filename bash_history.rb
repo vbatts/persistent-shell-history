@@ -64,10 +64,10 @@ if $0 == __FILE__
     opts.on('--inspect','inspect the data') do |o|
       options[:inspect] = o
     end
-    opts.on('--history FILE','use bash_history FILE instead of the default (~/.bash_history)') do |o|
+    opts.on('-h','--history FILE','use bash_history FILE instead of the default (~/.bash_history)') do |o|
       bh_options[:file] = o
     end
-    opts.on('--db FILE','use database FILE instead of the default (~/.bash_history.db)') do |o|
+    opts.on('-d','--db FILE','use database FILE instead of the default (~/.bash_history.db)') do |o|
       bh_options[:archive_file] = o
     end
     opts.on('-l','--list','list history') do |o|
