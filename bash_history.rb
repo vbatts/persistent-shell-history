@@ -15,6 +15,8 @@ class BashHistory
     @options = OPTIONS.merge(opts)
     _parse
   end
+  def time_format; @options[:time_format]; end
+  def time_format=(tf); @options[:time_format] = tf; end
   def db
     @db ||= GDBM.new(@options[:archive_file])
   end
@@ -67,12 +69,18 @@ if $0 == __FILE__
     opts.on('--fix','fix times') do |o|
       options[:fix] = o
     end
+    opts.on('--format FORMAT','specify a different strftime format. (default is "%F %T")') do |o|
+      options[:format] = o
+    end
     opts.on('-f','--find PAT','find a command with pattern PAT') do |o|
       options[:find] = o
     end
   end.parse!(ARGV)
 
   bh = BashHistory.new
+  if options[:format]
+    bh.time_format = options[:format]
+  end
   if options[:inspect]
     p bh
     p "storing #{bh.keys.count} commands"
