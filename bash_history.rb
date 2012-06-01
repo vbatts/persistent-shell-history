@@ -23,7 +23,16 @@ class BashHistory
   def keys; db.keys; end
   def keys_to_i; keys.map {|i| i.to_i }; end
   def values; db.map {|k,v| _yl(v) }; end
-  def values_by_time; db.map {|k,v| _yl(v) }.sort_by {|x| x[:time] } ; end
+  def values_by_time
+    return db.map {|k,v|
+      data = _yl(v)
+      data[:time].map {|t|
+        data.merge(:time => t)
+      }
+    }.flatten.sort_by {|x|
+      x[:time]
+    }
+  end
   def commands; values.map {|v| v[:cmd] }; end
   def _yd(data); YAML.dump(data); end
   def _yl(data); YAML.load(data); end
@@ -31,7 +40,13 @@ class BashHistory
   def _f(v); " %s %s" % [v[:time].strftime(@options[:time_format]), v[:cmd]]; end
 
   def find(pat)
-    values.select {|v| v if v[:cmd] =~ /#{pat}/ }
+    return values.select {|v|
+      v if v[:cmd] =~ /#{pat}/
+    }.map {|v|
+      v[:time].map {|t|
+        v.merge(:time => t)
+      }
+    }.flatten
   end
 
   def _parse
@@ -39,9 +54,31 @@ class BashHistory
       f.each_line do |line|
         if line =~ /^#(.*)$/
           l = f.readline.chomp
-          db[_md5(l)] = _yd({:cmd => l, :time => Time.at($1.to_i)})
+          key = _md5(l)
+          if db.has_key?(key)
+            times = _yl(db[key])[:time]
+            if times.kind_of? Array
+              times.push(Time.at($1.to_i))
+            else
+              times = [times]
+            end
+            db[key] = _yd({:cmd => l, :time => times.uniq })
+          else
+            db[key] = _yd({:cmd => l, :time => [Time.at($1.to_i)] })
+          end
         else
-          db[_md5(line.chomp)] = _yd({:cmd => line.chomp, :time => Time.at(0) })
+          key = _md5(line.chomp)
+          if db.has_key?(key)
+            times = _yl(db[key])[:time]
+            if times.kind_of? Array
+              times.push(Time.at($1.to_i))
+            else
+              times = [times]
+            end
+            db[key] = _yd({:cmd => l, :time => times.uniq })
+          else
+            db[key] = _yd({:cmd => line.chomp, :time => [Time.at(0)] })
+          end
         end
       end
     end
@@ -95,7 +132,11 @@ if $0 == __FILE__
     bh.db.each_pair do |k,v|
       yv = bh._yl(v)
       if yv[:time].nil?
-        yv[:time] = Time.at(0)
+        yv[:time] = [Time.at(0)]
+        bh.db[k] = bh._yd(yv)
+        count += 1
+      elsif not yv[:time].kind_of? Array
+        yv[:time] = [yv[:time]]
         bh.db[k] = bh._yd(yv)
         count += 1
       end
@@ -103,7 +144,7 @@ if $0 == __FILE__
     puts "fixed [#{count}] times values"
   end
   if options[:find]
-    bh.find(options[:find]).sort_by {|x| x[:time]}.each do |val|
+    bh.find(options[:find]).sort_by {|x| x[:time] }.each do |val|
       puts bh._f(val)
     end
   elsif options[:list]
