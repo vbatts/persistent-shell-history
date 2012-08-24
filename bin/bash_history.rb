@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'persistent-shell-history/bash-history'
+require 'persistent-shell-history/old-history-store'
 require 'optparse'
 
 options = {}

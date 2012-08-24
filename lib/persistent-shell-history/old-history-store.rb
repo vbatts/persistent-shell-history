@@ -7,7 +7,7 @@ require 'persistent-shell-history/abstract-history-store'
 
 module Persistent
   module Shell
-    class HistoryStore < AbstractHistoryStore
+    class OldHistoryStore < AbstractHistoryStore
       SCHEMA_VERSION = "1"
       OPTIONS = {
         :file          => File.expand_path("~/.bash_history"),
@@ -16,7 +16,7 @@ module Persistent
       }
       def initialize(opts = {})
         @options = OPTIONS.merge(opts)
-        _load if schema_match?
+        _load unless db.has_key? "schema_version"
       end
       def time_format; @options[:time_format]; end
       def time_format=(tf); @options[:time_format] = tf; end
