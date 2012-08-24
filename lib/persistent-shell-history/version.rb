@@ -1,7 +1,7 @@
 module Persistent
   module Shell
-    module History
-      VERSION = "0.0.1"
-    end
+    VERSION = "0.0.1"
   end
 end
+
+# vim: set sts=2 sw=2 et ai:

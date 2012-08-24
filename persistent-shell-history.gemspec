@@ -4,7 +4,7 @@ require "persistent-shell-history/version"
 
 Gem::Specification.new do |s|
   s.name        = "persistent-shell-history"
-  s.version     = Persistent::Shell::History::VERSION
+  s.version     = Persistent::Shell::VERSION
   s.authors     = ["Vincent Batts"]
   s.email       = ["vbatts@hashbangbash.com"]
   s.homepage    = ""

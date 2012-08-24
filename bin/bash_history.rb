@@ -29,7 +29,7 @@ OptionParser.new do |opts|
   end
 end.parse!(ARGV)
 
-bh = BashHistory.new(bh_options)
+bh = Persistent::Shell::DataStore.new(bh_options)
 
 if options[:inspect]
   p bh
@@ -61,3 +61,4 @@ elsif options[:list]
   end
 end
 
+# vim: set sts=2 sw=2 et ai:

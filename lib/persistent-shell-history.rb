@@ -3,8 +3,7 @@ require 'persistent-shell-history/bash-history'
 
 module Persistent
   module Shell
-    module History
-      # Your code goes here...
-    end
   end
 end
+
+# vim: set sts=2 sw=2 et ai:
