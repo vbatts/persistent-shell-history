@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# Encoding: UTF-8
 
 require 'digest/md5'
 require 'gdbm'
@@ -39,9 +40,11 @@ class BashHistory
   def _md5(data); Digest::MD5.hexdigest(data); end
   def _f(v); " %s %s" % [v[:time].strftime(@options[:time_format]), v[:cmd]]; end
 
+  def _e(str, enc = "UTF-8"); str.respond_to?(:force_encoding) ? str.force_encoding(enc) : str; end
+
   def find(pat)
     return values.select {|v|
-      v if v[:cmd] =~ /#{pat}/
+      v if _e(v[:cmd]) =~ /#{pat}/
     }.map {|v|
       v[:time].map {|t|
         v.merge(:time => t)
@@ -52,7 +55,7 @@ class BashHistory
   def _parse
     open(@options[:file]) do |f|
       f.each_line do |line|
-        if line =~ /^#(.*)$/
+        if _e(line) =~ /^#(.*)$/
           l = f.readline.chomp
           key = _md5(l)
           if db.has_key?(key)
