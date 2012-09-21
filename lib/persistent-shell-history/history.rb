@@ -1,5 +1,6 @@
 
 require 'persistent-shell-history/command'
+require 'json'
 
 module Persistent
   module Shell
@@ -11,6 +12,8 @@ module Persistent
       def commands; @cmds; end
       def commands=(cmds); @cmds = cmds; end
       def <<(arg); @cmds << arg; end
+      def to_a; commands.map {|c| c.to_h }; end
+      def to_json(*a); commands.to_json(*a); end
     end
     class BashHistory < History
       def initialize(filename = '~/.bash_history')

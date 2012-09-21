@@ -16,6 +16,7 @@ See README for other implementation helpers.
 }
 
   s.rubyforge_project = "persistent-shell-history"
+  s.add_dependency("json")
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

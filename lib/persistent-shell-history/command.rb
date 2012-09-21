@@ -1,5 +1,7 @@
 
 require 'digest/md5'
+require 'json'
+
 module Persistent
   module Shell
     class Command < Struct.new(:cmd, :time)
@@ -8,6 +10,9 @@ module Persistent
       end
       def to_h
         { :cmd => cmd, :time => time, }
+      end
+      def to_json(*a)
+        to_h.to_json(*a)
       end
     end
   end

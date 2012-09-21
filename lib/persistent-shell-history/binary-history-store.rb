@@ -9,7 +9,7 @@ require 'persistent-shell-history/command'
 
 module Persistent
   module Shell
-    class OldHistoryStore < AbstractHistoryStore
+    class BinaryHistoryStore < AbstractHistoryStore
       OPTIONS = {
         :file          => File.expand_path("~/.bash_history"),
         :archive_file  => File.expand_path("~/.bash_history.db"),
@@ -26,33 +26,17 @@ module Persistent
       def hist_file; @options[:file]; end
       def hist_file=(arg); @options[:file] = arg; end
 
-      # check the archive, whether it's the old format.
-      # If so, it needs to be converted to the BinaryHistoryStore
-      def is_oldformat?
-        db.keys[0..5].each {|key|
-          begin
-            YAML.load(db[key])
-          rescue Psych::SyntaxError => ex
-            return false
-          rescue => ex
-            return false
-          end
-        }
-        return true
-      end
-
       def time_format; @options[:time_format]; end
       def time_format=(tf); @options[:time_format] = tf; end
       def db
         @db ||= GDBM.new(@options[:archive_file])
       end
-      def [](key); _yl(db[key]); end
+      def [](key); _ml(db[key]); end
       def keys; db.keys; end
-      def keys_to_i; keys.map {|i| i.to_i }; end
-      def values; db.map {|k,v| _yl(v) }; end
+      def values; db.map {|k,v| _ml(v) }; end
       def values_by_time
         return db.map {|k,v|
-          data = _yl(v)
+          data = _ml(v)
           data[:time].map {|t|
             data.merge(:time => t)
           }
@@ -61,12 +45,12 @@ module Persistent
         }
       end
       def commands; values.map {|v| v[:cmd] }; end
-      def _yd(data); YAML.dump(data); end
-      def _yl(data); YAML.load(data); end
+      def _md(data); Marshal.dump(data); end
+      def _ml(data); Marshal.load(data); end
       def _md5(data); Digest::MD5.hexdigest(data); end
 
       # display a formatted time commend
-      def fmt(cmd); " %s %s" % [cmd[:time].strftime(@options[:time_format]), cmd[:cmd]]; end
+      def fmt(cmd); " %s %s" % [Time.at(cmd[:time]).strftime(@options[:time_format]), cmd[:cmd]]; end
     
       def find(pat)
         return values.select {|v|
@@ -85,28 +69,28 @@ module Persistent
               l = f.readline.chomp
               key = _md5(l)
               if db.has_key?(key)
-                times = _yl(db[key])[:time]
+                times = _ml(db[key])[:time]
                 if times.kind_of? Array
-                  times.push(Time.at($1.to_i))
+                  times.push($1.to_i)
                 else
                   times = [times]
                 end
-                db[key] = _yd({:cmd => l, :time => times.uniq })
+                db[key] = _md({:cmd => l, :time => times.uniq })
               else
-                db[key] = _yd({:cmd => l, :time => [Time.at($1.to_i)] })
+                db[key] = _md({:cmd => l, :time => [$1.to_i] })
               end
             else
               key = _md5(line.chomp)
               if db.has_key?(key)
-                times = _yl(db[key])[:time]
+                times = _ml(db[key])[:time]
                 if times.kind_of? Array
-                  times.push(Time.at($1.to_i))
+                  times.push($1.to_i)
                 else
                   times = [times]
                 end
-                db[key] = _yd({:cmd => l, :time => times.uniq })
+                db[key] = _md({:cmd => l, :time => times.uniq })
               else
-                db[key] = _yd({:cmd => line.chomp, :time => [Time.at(0)] })
+                db[key] = _md({:cmd => line.chomp, :time => [0] })
               end
             end
           end
@@ -134,8 +118,8 @@ module Persistent
           end
         end
       end
-    end # class DataStore
-  end # module Shell
-end # module Persistent
 
-# vim: set sts=2 sw=2 et ai:
+    end # class BinaryHistoryStore
+  end # Shell
+end # Persistent
+
