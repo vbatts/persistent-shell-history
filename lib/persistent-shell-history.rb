@@ -1,5 +1,5 @@
 require 'persistent-shell-history/version'
-require 'persistent-shell-history/bash-history'
+require 'persistent-shell-history/history'
 
 module Persistent
   module Shell

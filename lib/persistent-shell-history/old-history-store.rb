@@ -4,6 +4,8 @@ require 'gdbm'
 require 'yaml'
 
 require 'persistent-shell-history/abstract-history-store'
+require 'persistent-shell-history/history'
+require 'persistent-shell-history/command'
 
 module Persistent
   module Shell
@@ -16,7 +18,7 @@ module Persistent
       }
       def initialize(opts = {})
         @options = OPTIONS.merge(opts)
-        _load unless db.has_key? "schema_version"
+        #load() unless db.has_key? "schema_version"
       end
       def time_format; @options[:time_format]; end
       def time_format=(tf); @options[:time_format] = tf; end
@@ -52,8 +54,7 @@ module Persistent
         }.flatten
       end
     
-      def _load(filename = @options[:file])
-        #History.new(file).parse
+      def load(filename = @options[:file])
         open(filename) do |f|
           f.each_line do |line|
             if line =~ /^#(.*)$/
@@ -88,6 +89,19 @@ module Persistent
         end
       end
 
+      # returns a Persistent::Shell::History object from the current GDBM database.
+      # intended for marshalling to other history-stores
+      def to_history
+        history = History.new
+        values.each do |value|
+          value[:time].each do |t|
+            history << Command.new(value[:cmd], t.to_i)
+          end
+        end
+        return history
+      end
+
+      # create an output that looks like a regular ~/.bash_history file
       def render(file)
         File.open(file,'w+') do |f|
           values.each do |v|

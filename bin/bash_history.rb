@@ -30,6 +30,7 @@ OptionParser.new do |opts|
 end.parse!(ARGV)
 
 bh = Persistent::Shell::OldHistoryStore.new(bh_options)
+bh.load()
 
 if options[:inspect]
   p bh

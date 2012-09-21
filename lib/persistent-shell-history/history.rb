@@ -3,15 +3,22 @@ require 'persistent-shell-history/command'
 
 module Persistent
   module Shell
+    # Abstract storage for command history
     class History
+      def initialize()
+        @cmds = Array.new
+      end
+      def commands; @cmds; end
+      def commands=(cmds); @cmds = cmds; end
+      def <<(arg); @cmds << arg; end
+    end
+    class BashHistory < History
       def initialize(filename = '~/.bash_history')
         @filename = File.expand_path(filename)
       end
+      def commands; (@cmds.nil? or @cmds.empty?) ? (@cmds = parse) : @cmds; end
       def file; @filename; end
       def file=(filename); @filename = File.expand_path(filename); end
-      def commands
-        @cmds ||= parse
-      end
       def parse(filename = @filename)
         cmds = Array.new
         open(filename) do |f|
