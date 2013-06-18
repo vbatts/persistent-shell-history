@@ -67,11 +67,14 @@ exit(0) if options[:migrate]
 bh = Persistent::Shell::BinaryHistoryStore.new(bh_options)
 
 # load the new bash_history into the database
-bh.load() unless (options[:inspect] or options[:find] or options[:list])
+unless (options[:inspect] or options[:find] or options[:list])
+  bh.load()
+  bh.db.reorganize()
+end
 
 if options[:inspect]
   p bh
-  p "storing #{bh.keys.count} commands"
+  #p "storing #{bh.keys.count} commands"
 end
 if options[:find]
   bh.find(options[:find]).sort_by {|x| x[:time] }.each do |val|
