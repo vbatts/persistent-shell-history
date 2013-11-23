@@ -1,0 +1,3 @@
+* add a ~/.persistent-shell-history.yaml
+* move the db from gdbm to sqlite
+
