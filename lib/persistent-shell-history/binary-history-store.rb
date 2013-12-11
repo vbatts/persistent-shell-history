@@ -1,4 +1,3 @@
-
 require 'digest/md5'
 require 'gdbm'
 require 'yaml'
@@ -6,6 +5,11 @@ require 'yaml'
 require 'persistent-shell-history/abstract-history-store'
 require 'persistent-shell-history/history'
 require 'persistent-shell-history/command'
+
+if RUBY_VERSION >= "1.9" # assuming you're running Ruby ~1.9
+  Encoding.default_external = Encoding::UTF_8
+  Encoding.default_internal = Encoding::UTF_8
+end
 
 module Persistent
   module Shell
@@ -51,7 +55,7 @@ module Persistent
 
       # display a formatted time commend
       def fmt(cmd); " %s %s" % [Time.at(cmd[:time]).strftime(@options[:time_format]), cmd[:cmd]]; end
-    
+
       def find(pat)
         return values.select {|v|
           v if v[:cmd] =~ /#{pat}/
@@ -61,7 +65,7 @@ module Persistent
           }
         }.flatten
       end
-    
+
       def load(filename = @options[:file])
         open(filename) do |f|
           f.each_line do |line|
