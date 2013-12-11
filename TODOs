@@ -1,3 +1,17 @@
 * add a ~/.persistent-shell-history.yaml
 * move the db from gdbm to sqlite
+ - tables
+  ** hostname
+   -- id
+   -- name
+  ** command
+   -- id
+   -- value
+  ** record
+   -- id
+   -- timestamp
+   -- hostname_id
+   -- command_id
+* migration from current Marshal version need only to check the value, for if
+  it starts with "\x04\b{"
 
